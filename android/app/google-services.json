@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "134693614084",
+    "project_id": "social-media-app-e07fb",
+    "storage_bucket": "social-media-app-e07fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:134693614084:android:a51c22d0d5ceb5644efb51",
+        "android_client_info": {
+          "package_name": "com.h.mortaja.social_media_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "134693614084-rujfa8ngg5avo48mg9h427t4vfs4qal7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMYgqKyhBu7cjrTVKWChd_TwzjRyHh7F4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "134693614084-rujfa8ngg5avo48mg9h427t4vfs4qal7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
