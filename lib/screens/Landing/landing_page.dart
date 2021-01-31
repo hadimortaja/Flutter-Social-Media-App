@@ -12,22 +12,28 @@ class LandingPage extends StatelessWidget {
       backgroundColor: constantColors.whiteColor,
       body: Stack(
         children: [
-          bodyColor(),
-          Provider.of<LandingHelpers>(context, listen: false).bodyText(context),
-          
+          //bodyColor(),
+          //Provider.of<LandingHelpers>(context, listen: false).bodyText(context),
+          //Provider.of<LandingHelpers>(context, listen: false)
+          // .mainButton(context),
+          // Provider.of<LandingHelpers>(context, listen: false)
+          //     .privacyText(context),
+          Provider.of<LandingHelpers>(context, listen: false).body(context),
         ],
       ),
     );
   }
 
-  bodyColor() {
-    return Container(
-      decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0.5, 0.9],
-              colors: [Colors.grey.shade900, Colors.grey.shade900])),
-    );
-  }
+  // bodyColor() {
+  //   return Container(
+  //     color: Colors.white,
+  //     //decoration: BoxDecoration(
+
+  //     // gradient: LinearGradient(
+  //     //     begin: Alignment.topCenter,
+  //     //     end: Alignment.bottomCenter,
+  //     //     stops: [0.5, 0.9],
+  //     // colors: [Colors.grey.shade900, Colors.grey.shade900])),
+  //   );
+  // }
 }

@@ -27,25 +27,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade900,
+      // backgroundColor: Colors.grey.shade900,
       body: Center(
-        child: RichText(
-          text: TextSpan(
-              text: "Social",
-              style: TextStyle(
-                  fontFamily: 'Poppins',
-                  color: constantColors.whiteColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30),
-              children: <TextSpan>[
-                TextSpan(
-                    text: "Media",
-                    style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: constantColors.blueColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 30))
-              ]),
+        child: Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/logosocial.png"))),
         ),
       ),
     );
