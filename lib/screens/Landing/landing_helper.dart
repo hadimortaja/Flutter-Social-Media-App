@@ -1,6 +1,11 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:social_media_app/constants/constant_color.dart';
+import 'package:social_media_app/screens/Homepage/homepage.dart';
+import 'package:social_media_app/screens/Landing/landing_services.dart';
+import 'package:social_media_app/services/authentication.dart';
 
 class LandingHelpers with ChangeNotifier {
   final ConstantColors constantColors = ConstantColors();
@@ -138,7 +143,7 @@ class LandingHelpers with ChangeNotifier {
                 minWidth: double.infinity,
                 height: 40,
                 onPressed: () {
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                  emailAuthSheet(context);
                 },
                 shape: RoundedRectangleBorder(
                     side: BorderSide(color: Colors.yellow[900]),
@@ -149,7 +154,7 @@ class LandingHelpers with ChangeNotifier {
                     color: Colors.yellow[900],
                   ),
                   title: Text(
-                    "Sign Up With Email ",
+                    "Continue with Email",
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                   ),
                 ),
@@ -161,7 +166,16 @@ class LandingHelpers with ChangeNotifier {
                 minWidth: double.infinity,
                 height: 40,
                 onPressed: () {
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                  print("Siging with Google");
+                  Provider.of<Authentication>(context, listen: false)
+                      .signInWithGoogle()
+                      .whenComplete(() {
+                    Navigator.pushReplacement(
+                        context,
+                        PageTransition(
+                            child: HomePage(),
+                            type: PageTransitionType.rightToLeft));
+                  });
                 },
                 shape: RoundedRectangleBorder(
                     side: BorderSide(color: Colors.red),
@@ -172,33 +186,110 @@ class LandingHelpers with ChangeNotifier {
                     color: Colors.red,
                   ),
                   title: Text(
-                    "Sign Up With Google",
+                    "Sign in With Google",
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                   ),
                 ),
               )
             ]),
-            MaterialButton(
-              minWidth: double.infinity,
-              height: 40,
-              onPressed: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
-              },
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.blue[900]),
-                  borderRadius: BorderRadius.circular(50)),
-              child: ListTile(
-                leading: Icon(
-                  EvaIcons.facebook,
-                  color: Colors.blue[900],
-                ),
-                title: Text(
-                  "Sign Up With Facebook",
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-                ),
-              ),
-            )
+            // MaterialButton(
+            //   minWidth: double.infinity,
+            //   height: 40,
+            //   onPressed: () {
+            //     // Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+            //   },
+            //   shape: RoundedRectangleBorder(
+            //       side: BorderSide(color: Colors.blue[900]),
+            //       borderRadius: BorderRadius.circular(50)),
+            //   child: ListTile(
+            //     leading: Icon(
+            //       EvaIcons.facebook,
+            //       color: Colors.blue[900],
+            //     ),
+            //     title: Text(
+            //       "Sign in With Facebook",
+            //       style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+            //     ),
+            //   ),
+            // )
           ],
         ));
+  }
+
+  emailAuthSheet(BuildContext context) {
+    return showModalBottomSheet(
+        isDismissible: true,
+        context: context,
+        builder: (context) {
+          return Container(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 150),
+                  child: Divider(
+                    thickness: 4.0,
+                    color: Colors.black,
+                  ),
+                ),
+                Provider.of<LandingService>(context, listen: false)
+                    .passwordLessSignIn(context),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      width: 150,
+                      child: MaterialButton(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(color: Colors.yellow[900]),
+                            borderRadius: BorderRadius.circular(50)),
+                        child: Text(
+                          'SIGNIN',
+                          style: TextStyle(
+                            color: Colors.yellow[900],
+                            fontSize: 18,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Provider.of<LandingService>(context, listen: false)
+                              .signInSheet(context);
+                        },
+                      ),
+                    ),
+                    Container(
+                      width: 150,
+                      child: MaterialButton(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(color: Colors.blue[900]),
+                            borderRadius: BorderRadius.circular(50)),
+                        child: Text(
+                          'SignUp ',
+                          style: TextStyle(
+                            color: Colors.blue[900],
+                            fontSize: 18,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+
+                          Provider.of<LandingService>(context, listen: false)
+                              .signUpSheet(context);
+                        },
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
+            height: MediaQuery.of(context).size.height * 0.5,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15),
+                  topRight: Radius.circular(15),
+                )),
+          );
+        });
   }
 }
