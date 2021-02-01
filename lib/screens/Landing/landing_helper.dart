@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:social_media_app/constants/constant_color.dart';
 import 'package:social_media_app/screens/Homepage/homepage.dart';
 import 'package:social_media_app/screens/Landing/landing_services.dart';
+import 'package:social_media_app/screens/Landing/landing_utils.dart';
 import 'package:social_media_app/services/authentication.dart';
 
 class LandingHelpers with ChangeNotifier {
@@ -272,8 +273,8 @@ class LandingHelpers with ChangeNotifier {
                         onPressed: () {
                           Navigator.pop(context);
 
-                          Provider.of<LandingService>(context, listen: false)
-                              .signUpSheet(context);
+                          Provider.of<LandingUtils>(context, listen: false)
+                              .selectAvatarOptionsSheet(context);
                         },
                       ),
                     )

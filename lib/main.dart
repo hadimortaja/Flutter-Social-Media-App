@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:social_media_app/constants/constant_color.dart';
 import 'package:social_media_app/screens/Landing/landing_helper.dart';
 import 'package:social_media_app/screens/Landing/landing_services.dart';
-import 'package:social_media_app/screens/splash_screen.dart';
+import 'package:social_media_app/screens/Landing/landing_utils.dart';
+import 'package:social_media_app/screens/Splash/splash_screen.dart';
 import 'package:social_media_app/services/authentication.dart';
+import 'package:social_media_app/services/firebase_operations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +29,8 @@ class MyApp extends StatelessWidget {
           home: SplashScreen(),
         ),
         providers: [
+          ChangeNotifierProvider(create: (_) => LandingUtils()),
+          ChangeNotifierProvider(create: (_) => FirebaseOperations()),
           ChangeNotifierProvider(create: (_) => LandingService()),
           ChangeNotifierProvider(create: (_) => Authentication()),
           ChangeNotifierProvider(create: (_) => LandingHelpers())

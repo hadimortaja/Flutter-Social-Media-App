@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/screens/Homepage/homepage.dart';
+import 'package:social_media_app/screens/Landing/landing_utils.dart';
 import 'package:social_media_app/services/authentication.dart';
+import 'package:social_media_app/services/firebase_operations.dart';
 
 class LandingService with ChangeNotifier {
   TextEditingController nameController = TextEditingController();
@@ -11,12 +14,72 @@ class LandingService with ChangeNotifier {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  showUserAvatar(BuildContext context) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.30,
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 150),
+                  child: Divider(
+                    thickness: 4.0,
+                    color: Colors.black,
+                  ),
+                ),
+                CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.grey,
+                  backgroundImage: FileImage(
+                      Provider.of<LandingUtils>(context, listen: false)
+                          .userAvatar),
+                ),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      MaterialButton(
+                        onPressed: () {
+                          Provider.of<LandingUtils>(context, listen: false)
+                              .pickUserAvatar(context, ImageSource.gallery);
+                        },
+                        child: Text("Reselect"),
+                      ),
+                      MaterialButton(
+                        onPressed: () {
+                          Provider.of<FirebaseOperations>(context,
+                                  listen: false)
+                              .uploadUserAvatar(context)
+                              .whenComplete(() {
+                            Navigator.pop(context);
+                            signUpSheet(context);
+                          });
+                          //Navigator.pop(context);
+                        },
+                        child: Text("Confirm Image"),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+            ),
+          );
+        });
+  }
+
   Widget passwordLessSignIn(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.40,
       width: MediaQuery.of(context).size.width,
       child: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('allUsers').snapshots(),
+        stream: FirebaseFirestore.instance.collection('users').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -80,9 +143,10 @@ class LandingService with ChangeNotifier {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 15),
-                    child: FloatingActionButton(
+                    child: FloatingActionButton.extended(
+                      label: Text("SIGNIN"),
                       backgroundColor: Colors.grey,
-                      child: Icon(Icons.check),
+                      icon: Icon(Icons.check),
                       onPressed: () {
                         if (emailController.text.isNotEmpty) {
                           Provider.of<Authentication>(context, listen: false)
@@ -139,6 +203,9 @@ class LandingService with ChangeNotifier {
                     ),
                   ),
                   CircleAvatar(
+                    backgroundImage: FileImage(
+                        Provider.of<LandingUtils>(context, listen: false)
+                            .getUserAvatar),
                     backgroundColor: Colors.grey,
                     radius: 40,
                   ),
@@ -163,25 +230,45 @@ class LandingService with ChangeNotifier {
                       decoration: InputDecoration(hintText: "Enter password.."),
                     ),
                   ),
-                  FloatingActionButton(
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.check),
-                    onPressed: () {
-                      if (emailController.text.isNotEmpty) {
-                        Provider.of<Authentication>(context, listen: false)
-                            .createAccount(
-                                emailController.text, passwordController.text)
-                            .whenComplete(() {
-                          Navigator.pushReplacement(
-                              context,
-                              PageTransition(
-                                  child: HomePage(),
-                                  type: PageTransitionType.bottomToTop));
-                        });
-                      } else {
-                        warningText(context, "Fill all the data!");
-                      }
-                    },
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FloatingActionButton.extended(
+                      label: Text("Sign Up"),
+                      backgroundColor: Colors.grey,
+                      icon: Icon(Icons.check),
+                      onPressed: () {
+                        if (emailController.text.isNotEmpty &&
+                            passwordController.text.isNotEmpty &&
+                            nameController.text.isNotEmpty) {
+                          Provider.of<Authentication>(context, listen: false)
+                              .createAccount(
+                                  emailController.text, passwordController.text)
+                              .whenComplete(() {
+                            print("Creating Collection");
+                            Provider.of<FirebaseOperations>(context,
+                                    listen: false)
+                                .createUserCollection(context, {
+                              'useruid': Provider.of<Authentication>(context,
+                                      listen: false)
+                                  .getUserUid,
+                              'useremail': emailController.text,
+                              'username': nameController.text,
+                              'userimage': Provider.of<LandingUtils>(context,
+                                      listen: false)
+                                  .getuserAvatarUrl,
+                            });
+                          }).whenComplete(() {
+                            Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                    child: HomePage(),
+                                    type: PageTransitionType.bottomToTop));
+                          });
+                        } else {
+                          warningText(context, "Fill all the data!");
+                        }
+                      },
+                    ),
                   )
                 ],
               ),
