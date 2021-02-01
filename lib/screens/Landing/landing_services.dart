@@ -95,8 +95,9 @@ class LandingService with ChangeNotifier {
                   onPressed: () {},
                 ),
                 leading: CircleAvatar(
-                  backgroundImage:
-                      NetworkImage(documentSnapshot.data()['userimage']),
+                  backgroundImage: documentSnapshot.data()['userimage'] != null
+                      ? NetworkImage(documentSnapshot.data()['userimage'])
+                      : AssetImage("assets/images/empty.png"),
                 ),
                 title: Text(documentSnapshot.data()['username']),
                 subtitle: Text(documentSnapshot.data()['useremail']),

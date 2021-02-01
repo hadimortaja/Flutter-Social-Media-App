@@ -224,12 +224,20 @@ class LandingHelpers with ChangeNotifier {
         builder: (context) {
           return Container(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 150),
                   child: Divider(
                     thickness: 4.0,
                     color: Colors.black,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    "Users Already Signed Up :",
+                    style: TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
                 Provider.of<LandingService>(context, listen: false)
@@ -282,7 +290,7 @@ class LandingHelpers with ChangeNotifier {
                 )
               ],
             ),
-            height: MediaQuery.of(context).size.height * 0.5,
+            height: MediaQuery.of(context).size.height * 0.6,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
                 color: Colors.white,
