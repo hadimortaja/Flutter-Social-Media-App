@@ -138,6 +138,7 @@ class LandingService with ChangeNotifier {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: TextField(
+                      obscureText: true,
                       controller: passwordController,
                       decoration: InputDecoration(hintText: "Enter password.."),
                     ),
@@ -159,6 +160,8 @@ class LandingService with ChangeNotifier {
                                 PageTransition(
                                     child: HomePage(),
                                     type: PageTransitionType.bottomToTop));
+                            emailController.clear();
+                            passwordController.clear();
                           });
                         } else {
                           warningText(context, "Fill all the data!");
@@ -227,6 +230,7 @@ class LandingService with ChangeNotifier {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: TextField(
+                      obscureText: true,
                       controller: passwordController,
                       decoration: InputDecoration(hintText: "Enter password.."),
                     ),
@@ -264,6 +268,9 @@ class LandingService with ChangeNotifier {
                                 PageTransition(
                                     child: HomePage(),
                                     type: PageTransitionType.bottomToTop));
+                            nameController.clear();
+                            emailController.clear();
+                            passwordController.clear();
                           });
                         } else {
                           warningText(context, "Fill all the data!");

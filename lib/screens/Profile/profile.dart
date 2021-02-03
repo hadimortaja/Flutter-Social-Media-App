@@ -41,7 +41,7 @@ class Profile extends StatelessWidget {
           child: Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
-            child: StreamBuilder<DocumentSnapshot>(
+            child:StreamBuilder<DocumentSnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('users')
                   .doc(Provider.of<Authentication>(context, listen: false)

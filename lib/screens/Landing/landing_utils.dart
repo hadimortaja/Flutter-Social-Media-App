@@ -14,7 +14,8 @@ class LandingUtils with ChangeNotifier {
   String get getuserAvatarUrl => userAvatarUrl;
 
   Future pickUserAvatar(BuildContext context, ImageSource source) async {
-    final pickedUserAvatar = await picker.getImage(source: source);
+    final pickedUserAvatar =
+        await picker.getImage(source: source, imageQuality: 80);
     pickedUserAvatar == null
         ? print("Select Image")
         : userAvatar = File(pickedUserAvatar.path);
@@ -65,7 +66,7 @@ class LandingUtils with ChangeNotifier {
                         child: Text(
                           "Gallery",
                           style: TextStyle(color: Colors.black),
-                        ),  
+                        ),
                         onPressed: () {
                           pickUserAvatar(context, ImageSource.gallery)
                               .whenComplete(() {

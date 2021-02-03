@@ -10,10 +10,9 @@ class FirebaseOperations with ChangeNotifier {
   String initUserEmail;
   String initUserName;
   String initUserImage;
- String get getinitUserEmail => initUserEmail;
+  String get getinitUserEmail => initUserEmail;
   String get getinitUserName => initUserName;
- String get getinitUserImage => initUserImage;
-
+  String get getinitUserImage => initUserImage;
 
   Future uploadUserAvatar(BuildContext context) async {
     Reference imageReference = FirebaseStorage.instance.ref().child(
@@ -56,5 +55,9 @@ class FirebaseOperations with ChangeNotifier {
 
       notifyListeners();
     });
+  }
+
+  Future uploadPostData(String postId, dynamic data) async {
+    return FirebaseFirestore.instance.collection('posts').doc(postId).set(data);
   }
 }
