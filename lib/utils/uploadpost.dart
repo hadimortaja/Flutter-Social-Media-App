@@ -24,7 +24,7 @@ class UploadPost with ChangeNotifier {
 
   Future pickUploadPostImage(BuildContext context, ImageSource source) async {
     final uploadPostImageVal =
-        await picker.getImage(source: source, imageQuality: 80);
+        await picker.getImage(source: source, imageQuality: 20);
     uploadPostImageVal == null
         ? print("Select Image")
         : uploadPostImage = File(uploadPostImageVal.path);
@@ -233,11 +233,12 @@ class UploadPost with ChangeNotifier {
                   onPressed: () async {
                     Provider.of<FirebaseOperations>(context, listen: false)
                         .uploadPostData(captionController.text, {
+                      'postimage': getuploadPostImageUrl,
                       'caption': captionController.text,
                       'username': Provider.of<FirebaseOperations>(context,
                               listen: false)
                           .getinitUserName,
-                      'userImage': Provider.of<FirebaseOperations>(context,
+                      'userimage': Provider.of<FirebaseOperations>(context,
                               listen: false)
                           .getinitUserImage,
                       'useruid':
