@@ -17,8 +17,10 @@ class ProfileHelpers with ChangeNotifier {
               CircleAvatar(
                 radius: 40,
                 backgroundColor: Colors.white,
-                backgroundImage:
-                    NetworkImage(snapshot.data.data()['userimage']),
+                backgroundImage: (snapshot.data.data()['userimage'] == null)
+                    ? NetworkImage(
+                        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/600px-No_image_available.svg.png")
+                    : NetworkImage(snapshot.data.data()['userimage']),
               ),
               Expanded(
                 flex: 1,

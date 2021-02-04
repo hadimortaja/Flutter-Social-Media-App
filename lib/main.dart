@@ -11,6 +11,7 @@ import 'package:social_media_app/screens/Profile/profilehelpers.dart';
 import 'package:social_media_app/screens/Splash/splash_screen.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/services/firebase_operations.dart';
+import 'package:social_media_app/utils/postoptions.dart';
 import 'package:social_media_app/utils/uploadpost.dart';
 
 void main() async {
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
           home: SplashScreen(),
         ),
         providers: [
+          ChangeNotifierProvider(create: (_) => PostFunctions()),
           ChangeNotifierProvider(create: (_) => FeedHelpers()),
           ChangeNotifierProvider(create: (_) => UploadPost()),
           ChangeNotifierProvider(create: (_) => ProfileHelpers()),

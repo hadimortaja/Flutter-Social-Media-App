@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/services/authentication.dart';
+import 'package:social_media_app/utils/postoptions.dart';
 import 'package:social_media_app/utils/uploadpost.dart';
 
 class FeedHelpers with ChangeNotifier {
@@ -38,7 +39,10 @@ class FeedHelpers with ChangeNotifier {
         padding: const EdgeInsets.only(top: 8.0),
         child: Container(
           child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+            stream: FirebaseFirestore.instance
+                .collection('posts')
+                .orderBy('time', descending: true)
+                .snapshots(), /////
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(
@@ -83,7 +87,37 @@ class FeedHelpers with ChangeNotifier {
                   title: Text(documentSnapshot.data()['username']),
                   subtitle: Text(documentSnapshot.data()['caption']),
                 ),
-              ) ,
+              )
+              // Row(
+              //   children: [
+              //     GestureDetector(
+              //       child: CircleAvatar(
+              //         backgroundColor: Colors.grey,
+              //         radius: 20,
+              //         backgroundImage: (documentSnapshot.data()['userimage'] ==
+              //                 null)
+              //             ? AssetImage("")
+              //             : NetworkImage(documentSnapshot.data()['userimage']),
+              //       ),
+              //     ),
+              //     Container(
+              //       width: MediaQuery.of(context).size.width * 0.6,
+              //       child: Column(
+              //         mainAxisAlignment: MainAxisAlignment.start,
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           Container(
+              //             child: Text(documentSnapshot.data()['caption']),
+              //           ),
+              //           Container(
+              //             child: Text(documentSnapshot.data()['username']),
+              //           ),
+              //         ],
+              //       ),
+              //     )
+              //   ],
+              // ),
+              ,
               Container(
                 height: 250,
                 width: MediaQuery.of(context).size.width,
@@ -126,6 +160,11 @@ class FeedHelpers with ChangeNotifier {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           GestureDetector(
+                            onTap: () {
+                              Provider.of<PostFunctions>(context, listen: false)
+                                  .showCommentsSheet(context, documentSnapshot,
+                                      documentSnapshot.data()['caption']);
+                            },
                             child: Icon(
                               FontAwesomeIcons.comment,
                               color: Colors.black,

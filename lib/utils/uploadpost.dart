@@ -136,8 +136,6 @@ class UploadPost with ChangeNotifier {
                           },
                           child: Text("Confirm Image"),
                         ),
-
-                        //Navigator.pop(context);
                       ]),
                 )
               ],
@@ -241,6 +239,8 @@ class UploadPost with ChangeNotifier {
                       'userimage': Provider.of<FirebaseOperations>(context,
                               listen: false)
                           .getinitUserImage,
+
+                      ///
                       'useruid':
                           Provider.of<Authentication>(context, listen: false)
                               .getUserUid,

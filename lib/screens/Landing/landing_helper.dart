@@ -259,7 +259,7 @@ class LandingHelpers with ChangeNotifier {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
+                          //  Navigator.pop(context);//////////
                           Provider.of<LandingService>(context, listen: false)
                               .signInSheet(context);
                         },
@@ -279,7 +279,7 @@ class LandingHelpers with ChangeNotifier {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
+                          //  Navigator.pop(context);/////////////
 
                           Provider.of<LandingUtils>(context, listen: false)
                               .selectAvatarOptionsSheet(context);

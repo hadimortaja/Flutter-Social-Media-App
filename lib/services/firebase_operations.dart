@@ -24,8 +24,7 @@ class FirebaseOperations with ChangeNotifier {
       print("Image Uploaded");
     });
     imageReference.getDownloadURL().then((url) {
-      Provider.of<LandingUtils>(context, listen: false).userAvatarUrl =
-          url.toString();
+      Provider.of<LandingUtils>(context, listen: false).userAvatarUrl = "$url";
       print(
           "The user profile avatar url => ${Provider.of<LandingUtils>(context, listen: false).userAvatarUrl}");
       notifyListeners();
@@ -59,5 +58,9 @@ class FirebaseOperations with ChangeNotifier {
 
   Future uploadPostData(String postId, dynamic data) async {
     return FirebaseFirestore.instance.collection('posts').doc(postId).set(data);
+  }
+
+  Future deleteUserData(String userUid) async {
+    return FirebaseFirestore.instance.collection('users').doc(userUid).delete();
   }
 }

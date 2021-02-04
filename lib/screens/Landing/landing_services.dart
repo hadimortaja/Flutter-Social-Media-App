@@ -54,7 +54,7 @@ class LandingService with ChangeNotifier {
                                   listen: false)
                               .uploadUserAvatar(context)
                               .whenComplete(() {
-                            Navigator.pop(context);
+                            // Navigator.pop(context);/////////
                             signUpSheet(context);
                           });
                           //Navigator.pop(context);
@@ -90,14 +90,46 @@ class LandingService with ChangeNotifier {
                 children:
                     snapshot.data.docs.map((DocumentSnapshot documentSnapshot) {
               return ListTile(
-                trailing: IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {},
+                trailing: Container(
+                  width: 100,
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.check),
+                        onPressed: () {
+                          Provider.of<Authentication>(context, listen: false)
+                              .logIntoAccount(
+                                  documentSnapshot.data()['useremail'],
+                                  documentSnapshot.data()['userpassword'])
+                              .whenComplete(() {
+                            Navigator.pushReplacement(
+                                context,
+                                PageTransition(
+                                    child: HomePage(),
+                                    type: PageTransitionType.rightToLeft));
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          Provider.of<FirebaseOperations>(context,
+                                  listen: false)
+                              .deleteUserData(
+                                  documentSnapshot.data()['useruid']);
+                        },
+                      )
+                    ],
+                  ),
                 ),
                 leading: CircleAvatar(
-                  backgroundImage: documentSnapshot.data()['userimage'] != null
-                      ? NetworkImage(documentSnapshot.data()['userimage'])
-                      : AssetImage("assets/images/empty.png"),
+                  backgroundColor: Colors.grey,
+                  backgroundImage:
+                      (documentSnapshot.data()['userimage'] != null)
+                          ? NetworkImage(documentSnapshot.data()['userimage'])
+                          : AssetImage("assets/images/empty.png"),
                 ),
                 title: Text(documentSnapshot.data()['username']),
                 subtitle: Text(documentSnapshot.data()['useremail']),
@@ -253,6 +285,7 @@ class LandingService with ChangeNotifier {
                             Provider.of<FirebaseOperations>(context,
                                     listen: false)
                                 .createUserCollection(context, {
+                              'userpassword': passwordController.text,
                               'useruid': Provider.of<Authentication>(context,
                                       listen: false)
                                   .getUserUid,

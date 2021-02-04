@@ -70,7 +70,7 @@ class LandingUtils with ChangeNotifier {
                         onPressed: () {
                           pickUserAvatar(context, ImageSource.gallery)
                               .whenComplete(() {
-                            Navigator.pop(context);
+                            //  Navigator.pop(context);/////////
                             Provider.of<LandingService>(context, listen: false)
                                 .showUserAvatar(context);
                           });
@@ -89,7 +89,7 @@ class LandingUtils with ChangeNotifier {
                         onPressed: () {
                           pickUserAvatar(context, ImageSource.camera)
                               .whenComplete(() {
-                            Navigator.pop(context);
+                            // Navigator.pop(context);///////////////
                             Provider.of<LandingService>(context, listen: false)
                                 .showUserAvatar(context);
                           });
