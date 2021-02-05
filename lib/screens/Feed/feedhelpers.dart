@@ -121,14 +121,24 @@ class FeedHelpers with ChangeNotifier {
               Container(
                 height: 250,
                 width: MediaQuery.of(context).size.width,
-                child: FittedBox(
-                  child: (documentSnapshot.data()['postimage'] == null)
-                      ? CircularProgressIndicator()
-                      : Image.network(
-                          documentSnapshot.data()['postimage'],
-                          scale: 5,
-                          fit: BoxFit.cover,
-                        ),
+                child: GestureDetector(
+                  onDoubleTap: () {
+                    print("adding like double tap...");
+                    Provider.of<PostFunctions>(context, listen: false).addLike(
+                        context,
+                        documentSnapshot.data()['caption'],
+                        Provider.of<Authentication>(context, listen: false)
+                            .getUserUid);
+                  },
+                  child: FittedBox(
+                    child: (documentSnapshot.data()['postimage'] == null)
+                        ? CircularProgressIndicator()
+                        : Image.network(
+                            documentSnapshot.data()['postimage'],
+                            scale: 5,
+                            fit: BoxFit.cover,
+                          ),
+                  ),
                 ),
               ),
               Padding(
@@ -142,14 +152,48 @@ class FeedHelpers with ChangeNotifier {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           GestureDetector(
+                            onLongPress: () {
+                              Provider.of<PostFunctions>(context, listen: false)
+                                  .showLikes(context,
+                                      documentSnapshot.data()['caption']);
+                            },
+                            onTap: () {
+                              print("adding like...");
+                              Provider.of<PostFunctions>(context, listen: false)
+                                  .addLike(
+                                      context,
+                                      documentSnapshot.data()['caption'],
+                                      Provider.of<Authentication>(context,
+                                              listen: false)
+                                          .getUserUid);
+                            },
                             child: Icon(
                               FontAwesomeIcons.heart,
                               color: Colors.black,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Text("0"),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('posts')
+                                .doc(
+                                  documentSnapshot.data()['caption'],
+                                )
+                                .collection('likes')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else {
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                      snapshot.data.docs.length.toString()),
+                                );
+                              }
+                            },
                           )
                         ],
                       ),
@@ -170,9 +214,28 @@ class FeedHelpers with ChangeNotifier {
                               color: Colors.black,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Text("0"),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('posts')
+                                .doc(
+                                  documentSnapshot.data()['caption'],
+                                )
+                                .collection('comments')
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else {
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                      snapshot.data.docs.length.toString()),
+                                );
+                              }
+                            },
                           )
                         ],
                       ),

@@ -76,7 +76,7 @@ class LandingService with ChangeNotifier {
 
   Widget passwordLessSignIn(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.40,
+      height: MediaQuery.of(context).size.height * 0.39,
       width: MediaQuery.of(context).size.width,
       child: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('users').snapshots(),
