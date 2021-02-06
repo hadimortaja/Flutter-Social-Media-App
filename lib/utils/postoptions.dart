@@ -1,11 +1,144 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:social_media_app/screens/AltProfile/alt_profile.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/services/firebase_operations.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class PostFunctions with ChangeNotifier {
   TextEditingController commentController = TextEditingController();
+  TextEditingController updatedCaption = TextEditingController();
+
+  String imageTimePosted;
+  String get getImageTimePosted => imageTimePosted;
+
+  showTimeAgo(dynamic timedata) {
+    Timestamp time = timedata;
+    DateTime dateTime = time.toDate();
+    imageTimePosted = timeago.format(dateTime);
+    print(imageTimePosted);
+    //notifyListeners();
+  }
+
+  showPostOptions(BuildContext context, String postId) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 150),
+                  child: Divider(
+                    thickness: 4.0,
+                    color: Colors.black,
+                  ),
+                ),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      MaterialButton(
+                        child: Text("Edit Caption "),
+                        onPressed: () {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return Container(
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 150),
+                                        child: Divider(
+                                          thickness: 4.0,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      Center(
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 300,
+                                              height: 50,
+                                              child: TextField(
+                                                controller: updatedCaption,
+                                                decoration: InputDecoration(
+                                                    hintText:
+                                                        "Add new caption"),
+                                              ),
+                                            ),
+                                            FloatingActionButton(
+                                              child: Icon(Icons.file_upload),
+                                              onPressed: () {
+                                                Provider.of<FirebaseOperations>(
+                                                        context,
+                                                        listen: false)
+                                                    .updateCaption(postId, {
+                                                  "caption":
+                                                      updatedCaption.text,
+                                                });
+                                              },
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              });
+                        },
+                      ),
+                      MaterialButton(
+                        child: Text("Delete Post "),
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text("Delete This Post?"),
+                                  actions: [
+                                    FlatButton(
+                                      onPressed: () {
+                                        print("you choose no");
+                                        Navigator.of(context).pop(false);
+                                      },
+                                      child: Text('No'),
+                                    ),
+                                    FlatButton(
+                                      onPressed: () {
+                                        Provider.of<FirebaseOperations>(context,
+                                                listen: false)
+                                            .deleteUserData(postId, "posts")
+                                            .whenComplete(() {
+                                          Navigator.pop(context);
+                                        });
+                                      },
+                                      child: Text('Yes'),
+                                    ),
+                                  ],
+                                );
+                              });
+                        },
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+              color: Colors.white,
+            ),
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: MediaQuery.of(context).size.width,
+          );
+        });
+  }
+
   Future addLike(BuildContext context, String postId, String subDocId) async {
     return FirebaseFirestore.instance
         .collection('posts')
@@ -113,6 +246,26 @@ class PostFunctions with ChangeNotifier {
                                         padding: const EdgeInsets.only(
                                             top: 8.0, left: 8.0),
                                         child: GestureDetector(
+                                          onTap: () {
+                                            if (documentSnapshot
+                                                    .data()['useruid'] !=
+                                                Provider.of<Authentication>(
+                                                        context,
+                                                        listen: false)
+                                                    .getUserUid) {
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  PageTransition(
+                                                      child: AltProfile(
+                                                        userUid:
+                                                            documentSnapshot
+                                                                    .data()[
+                                                                'useruid'],
+                                                      ),
+                                                      type: PageTransitionType
+                                                          .bottomToTop));
+                                            }
+                                          },
                                           child: CircleAvatar(
                                             radius: 15,
                                             backgroundColor: Colors.grey,
@@ -292,11 +445,27 @@ class PostFunctions with ChangeNotifier {
                                 .map((DocumentSnapshot documentSnapshot) {
                           return ListTile(
                             leading: GestureDetector(
+                                onTap: () {
+                                  if (documentSnapshot.data()['useruid'] !=
+                                      Provider.of<Authentication>(context,
+                                              listen: false)
+                                          .getUserUid) {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        PageTransition(
+                                            child: AltProfile(
+                                              userUid: documentSnapshot
+                                                  .data()['useruid'],
+                                            ),
+                                            type: PageTransitionType
+                                                .bottomToTop));
+                                  }
+                                },
                                 child: CircleAvatar(
-                              backgroundColor: Colors.grey,
-                              backgroundImage: NetworkImage(
-                                  documentSnapshot.data()['userimage']),
-                            )),
+                                  backgroundColor: Colors.grey,
+                                  backgroundImage: NetworkImage(
+                                      documentSnapshot.data()['userimage']),
+                                )),
                             title: Text(documentSnapshot.data()['username']),
                             subtitle:
                                 Text(documentSnapshot.data()['useremail']),

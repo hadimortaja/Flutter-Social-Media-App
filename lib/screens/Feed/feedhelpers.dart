@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:social_media_app/screens/AltProfile/alt_profile.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/utils/postoptions.dart';
 import 'package:social_media_app/utils/uploadpost.dart';
@@ -72,6 +74,8 @@ class FeedHelpers with ChangeNotifier {
     return SingleChildScrollView(
       child: Column(
         children: snapshot.data.docs.map((DocumentSnapshot documentSnapshot) {
+          Provider.of<PostFunctions>(context, listen: false)
+              .showTimeAgo(documentSnapshot.data()['time']);
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,65 +83,63 @@ class FeedHelpers with ChangeNotifier {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.grey,
-                    backgroundImage:
-                        NetworkImage(documentSnapshot.data()['userimage']),
+                  leading: GestureDetector(
+                    onTap: () {
+                      if (documentSnapshot.data()['useruid'] !=
+                          Provider.of<Authentication>(context, listen: false)
+                              .getUserUid) {
+                        Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                child: AltProfile(
+                                  userUid: documentSnapshot.data()['useruid'],
+                                ),
+                                type: PageTransitionType.bottomToTop));
+                      }
+                    },
+                    child: CircleAvatar(
+                      backgroundColor: Colors.grey,
+                      backgroundImage:
+                          NetworkImage(documentSnapshot.data()['userimage']),
+                    ),
                   ),
                   title: Text(documentSnapshot.data()['username']),
-                  subtitle: Text(documentSnapshot.data()['caption']),
+                  subtitle: Row(
+                    children: [
+                      Text("${documentSnapshot.data()['caption']}"),
+                      Text(
+                        " ,${Provider.of<PostFunctions>(context, listen: false).getImageTimePosted.toString()}",
+                        style: TextStyle(color: Colors.grey),
+                      )
+                    ],
+                  ),
                 ),
-              )
-              // Row(
-              //   children: [
-              //     GestureDetector(
-              //       child: CircleAvatar(
-              //         backgroundColor: Colors.grey,
-              //         radius: 20,
-              //         backgroundImage: (documentSnapshot.data()['userimage'] ==
-              //                 null)
-              //             ? AssetImage("")
-              //             : NetworkImage(documentSnapshot.data()['userimage']),
-              //       ),
-              //     ),
-              //     Container(
-              //       width: MediaQuery.of(context).size.width * 0.6,
-              //       child: Column(
-              //         mainAxisAlignment: MainAxisAlignment.start,
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: [
-              //           Container(
-              //             child: Text(documentSnapshot.data()['caption']),
-              //           ),
-              //           Container(
-              //             child: Text(documentSnapshot.data()['username']),
-              //           ),
-              //         ],
-              //       ),
-              //     )
-              //   ],
-              // ),
-              ,
-              Container(
-                height: 250,
-                width: MediaQuery.of(context).size.width,
-                child: GestureDetector(
-                  onDoubleTap: () {
-                    print("adding like double tap...");
-                    Provider.of<PostFunctions>(context, listen: false).addLike(
-                        context,
-                        documentSnapshot.data()['caption'],
-                        Provider.of<Authentication>(context, listen: false)
-                            .getUserUid);
-                  },
-                  child: FittedBox(
-                    child: (documentSnapshot.data()['postimage'] == null)
-                        ? CircularProgressIndicator()
-                        : Image.network(
-                            documentSnapshot.data()['postimage'],
-                            scale: 5,
-                            fit: BoxFit.cover,
-                          ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 250,
+                  width: MediaQuery.of(context).size.width,
+                  child: GestureDetector(
+                    onDoubleTap: () {
+                      print("adding like double tap...");
+                      Provider.of<PostFunctions>(context, listen: false)
+                          .addLike(
+                              context,
+                              documentSnapshot.data()['caption'],
+                              Provider.of<Authentication>(context,
+                                      listen: false)
+                                  .getUserUid);
+                    },
+                    child: Container(
+                      child: (documentSnapshot.data()['postimage'] == null)
+                          ? CircularProgressIndicator()
+                          : Image.network(
+                              documentSnapshot.data()['postimage'],
+                              scale: 2,
+                              fit: BoxFit.cover,
+                            ),
+                    ),
                   ),
                 ),
               ),
@@ -246,7 +248,11 @@ class FeedHelpers with ChangeNotifier {
                             documentSnapshot.data()['useruid']
                         ? IconButton(
                             icon: Icon(Icons.more_vert),
-                            onPressed: () {},
+                            onPressed: () {
+                              Provider.of<PostFunctions>(context, listen: false)
+                                  .showPostOptions(context,
+                                      documentSnapshot.data()['caption']);
+                            },
                           )
                         : Container(
                             width: 0,
