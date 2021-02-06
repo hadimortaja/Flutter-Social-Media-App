@@ -31,8 +31,74 @@ class ProfileHelpers with ChangeNotifier {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         createColumns("Posts", "0"),
-                        createColumns("Followers", "0"),
-                        createColumns("Following", "0"),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(snapshot.data.data()['useruid'])
+                                  .collection('followers')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  return Text(
+                                      snapshot.data.docs.length.toString());
+                                }
+                              },
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 5),
+                              child: Text(
+                                "Followers",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(snapshot.data.data()['useruid'])
+                                  .collection('following')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  return Text(
+                                      snapshot.data.docs.length.toString());
+                                }
+                              },
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 5),
+                              child: Text(
+                                "Following",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ],
@@ -195,40 +261,76 @@ class ProfileHelpers with ChangeNotifier {
     );
   }
 
-  // Widget middleProfile(BuildContext context, dynamic snapshot) {
-  //   return Column(
-  //     mainAxisAlignment: MainAxisAlignment.start,
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Padding(
-  //         padding: const EdgeInsets.only(top: 10),
-  //         child: Container(
-  //           width: 150,
-  //           decoration: BoxDecoration(borderRadius: BorderRadius.circular(2.0)),
-  //           child: Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //             children: [
-  //               Icon(
-  //                 FontAwesomeIcons.userAstronaut,
-  //               ),
-  //               Text("Recently Added")
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //       Padding(
-  //         padding: const EdgeInsets.only(top: 20),
-  //         child: Container(
-  //           height: MediaQuery.of(context).size.height * 0.1,
-  //           width: MediaQuery.of(context).size.width,
-  //           decoration: BoxDecoration(
-  //               color: Colors.grey.shade400,
-  //               borderRadius: BorderRadius.circular(15)),
-  //         ),
-  //       )
-  //     ],
-  //   );
-  // }
+  Widget middleProfile(BuildContext context, dynamic snapshot) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Container(
+            width: 150,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(2.0)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(
+                  FontAwesomeIcons.userAstronaut,
+                ),
+                Text("Recently Added")
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Container(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(snapshot.data.data()['useruid'])
+                  .collection('following')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return Row(
+                    children: snapshot.data.docs
+                        .map((DocumentSnapshot documentSnapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else {
+                        return Container(
+                          height: 50,
+                          width: 50,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.grey,
+                            backgroundImage: NetworkImage(
+                                documentSnapshot.data()['userimage']),
+                          ),
+                        );
+                      }
+                    }).toList(),
+                  );
+                }
+              },
+            ),
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(15)),
+          ),
+        )
+      ],
+    );
+  }
+
   Widget footerProfile(BuildContext context, dynamic snapshot) {
     return Padding(
       padding: const EdgeInsets.all(8),

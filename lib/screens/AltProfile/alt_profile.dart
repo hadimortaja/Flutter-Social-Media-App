@@ -11,22 +11,22 @@ class AltProfile extends StatelessWidget {
     return Scaffold(
       appBar: Provider.of<AltProfileHelpers>(context, listen: false)
           .appBar(context),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: StreamBuilder<DocumentSnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(userUid)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else {
-                  return Column(
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('users')
+                .doc(userUid)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                return SingleChildScrollView(
+                  child: Column(
                     children: [
                       Provider.of<AltProfileHelpers>(context, listen: false)
                           .headerProfile(context, snapshot, userUid),
@@ -35,13 +35,13 @@ class AltProfile extends StatelessWidget {
                       Provider.of<AltProfileHelpers>(context, listen: false)
                           .footerProfile(context, snapshot),
                     ],
-                  );
-                }
-              },
-            ),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15), color: Colors.white),
+                  ),
+                );
+              }
+            },
           ),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15), color: Colors.white),
         ),
       ),
     );

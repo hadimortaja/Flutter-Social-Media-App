@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:social_media_app/screens/Homepage/homepage.dart';
+import 'package:social_media_app/services/authentication.dart';
+import 'package:social_media_app/services/firebase_operations.dart';
 
 class AltProfileHelpers with ChangeNotifier {
   Widget appBar(BuildContext context) {
     return AppBar(
+      centerTitle: true,
       backgroundColor: Colors.white,
       leading: IconButton(
         icon: Icon(Icons.arrow_back_ios_rounded),
@@ -17,18 +21,17 @@ class AltProfileHelpers with ChangeNotifier {
                   child: HomePage(), type: PageTransitionType.bottomToTop));
         },
       ),
-      
       actions: [
         IconButton(
-        icon: Icon(Icons.more_vert),
-        color: Colors.grey,
-        onPressed: () {
-          // Navigator.pushReplacement(
-          //     context,
-          //     PageTransition(
-          //         child: HomePage(), type: PageTransitionType.bottomToTop));
-        },
-      ),
+          icon: Icon(Icons.more_vert),
+          color: Colors.grey,
+          onPressed: () {
+            // Navigator.pushReplacement(
+            //     context,
+            //     PageTransition(
+            //         child: HomePage(), type: PageTransitionType.bottomToTop));
+          },
+        ),
       ],
       title: Image.asset(
         "assets/images/logosocial.png",
@@ -36,7 +39,9 @@ class AltProfileHelpers with ChangeNotifier {
       ),
     );
   }
-  Widget headerProfile(BuildContext context,AsyncSnapshot<DocumentSnapshot> snapshot,String userUid) {
+
+  Widget headerProfile(BuildContext context,
+      AsyncSnapshot<DocumentSnapshot> snapshot, String userUid) {
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
@@ -60,8 +65,76 @@ class AltProfileHelpers with ChangeNotifier {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         createColumns("Posts", "0"),
-                        createColumns("Followers", "0"),
-                        createColumns("Following", "0"),
+                        //createColumns("Followers", "0"),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(snapshot.data.data()['useruid'])
+                                  .collection('followers')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  return Text(
+                                      snapshot.data.docs.length.toString());
+                                }
+                              },
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 5),
+                              child: Text(
+                                "Followers",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(snapshot.data.data()['useruid'])
+                                  .collection('following')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  return Text(
+                                      snapshot.data.docs.length.toString());
+                                }
+                              },
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 5),
+                              child: Text(
+                                "Following",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ],
@@ -95,12 +168,74 @@ class AltProfileHelpers with ChangeNotifier {
                   fontWeight: FontWeight.w300),
             ),
           ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.10,
+            width: MediaQuery.of(context).size.width,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                MaterialButton(
+                  color: Colors.blue,
+                  onPressed: () {
+                    Provider.of<FirebaseOperations>(context, listen: false)
+                        .followUser(
+                            userUid,
+                            Provider.of<Authentication>(context, listen: false)
+                                .getUserUid,
+                            {
+                              'username': Provider.of<FirebaseOperations>(
+                                      context,
+                                      listen: false)
+                                  .getinitUserName,
+                              'userimage': Provider.of<FirebaseOperations>(
+                                      context,
+                                      listen: false)
+                                  .getinitUserImage,
+                              'useruid': Provider.of<Authentication>(context,
+                                      listen: false)
+                                  .getUserUid,
+                              'useremail': Provider.of<FirebaseOperations>(
+                                      context,
+                                      listen: false)
+                                  .getinitUserEmail,
+                              'time': Timestamp.now(),
+                            },
+                            Provider.of<Authentication>(context, listen: false)
+                                .getUserUid,
+                            userUid,
+                            {
+                              'username': snapshot.data.data()['username'],
+                              'userimage': snapshot.data.data()['userimage'],
+                              'useremail': snapshot.data.data()['useremail'],
+                              'useruid': snapshot.data.data()['useruid'],
+                              'time': Timestamp.now(),
+                            })
+                        .whenComplete(() {
+                      followedNotification(
+                          context, snapshot.data.data()['username']);
+                    });
+                  },
+                  child: Text(
+                    "Follow",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                MaterialButton(
+                  color: Colors.blue,
+                  onPressed: () {},
+                  child: Text(
+                    "Message",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
+              ],
+            ),
+          )
         ],
       ),
     );
-   
-    
   }
+
   Widget divider() {
     return Center(
       child: Container(
@@ -112,7 +247,8 @@ class AltProfileHelpers with ChangeNotifier {
       ),
     );
   }
-   Widget footerProfile(BuildContext context, dynamic snapshot) {
+
+  Widget footerProfile(BuildContext context, dynamic snapshot) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Container(
@@ -123,6 +259,7 @@ class AltProfileHelpers with ChangeNotifier {
       ),
     );
   }
+
   createColumns(String title, String count) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -143,5 +280,10 @@ class AltProfileHelpers with ChangeNotifier {
         ),
       ],
     );
+  }
+
+  followedNotification(BuildContext context, String name) {
+    return Scaffold.of(context)
+        .showSnackBar(SnackBar(content: new Text("Followed $name")));
   }
 }

@@ -56,9 +56,9 @@ class Profile extends StatelessWidget {
                       Provider.of<ProfileHelpers>(context, listen: false)
                           .headerProfile(context, snapshot),
                       Provider.of<ProfileHelpers>(context, listen: false)
+                          .middleProfile(context, snapshot),
+                      Provider.of<ProfileHelpers>(context, listen: false)
                           .divider(),
-                      // Provider.of<ProfileHelpers>(context, listen: false)
-                      //     .middleProfile(context, snapshot)
                       Provider.of<ProfileHelpers>(context, listen: false)
                           .footerProfile(context, snapshot),
                     ],
