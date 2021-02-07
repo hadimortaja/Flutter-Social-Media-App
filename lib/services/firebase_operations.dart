@@ -92,6 +92,13 @@ class FirebaseOperations with ChangeNotifier {
     });
   }
 
+  Future submitChatroomData(String chatRoomName, dynamic chatRoomData) async {
+    return FirebaseFirestore.instance
+        .collection('chatrooms')
+        .doc(chatRoomName)
+        .set(chatRoomData);
+  }
+
   // Future <bool> checkFollow(String followingUid, String userid) async {
   //   FirebaseFirestore.instance
   //       .collection('users')

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/constants/constant_color.dart';
 import 'package:social_media_app/screens/AltProfile/alt_profile_helpers.dart';
+import 'package:social_media_app/screens/ChatRoom/chatroomhelpers.dart';
 import 'package:social_media_app/screens/Feed/feedhelpers.dart';
 import 'package:social_media_app/screens/Homepage/homepagehelpers.dart';
 import 'package:social_media_app/screens/Landing/landing_helper.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
           home: SplashScreen(),
         ),
         providers: [
+          ChangeNotifierProvider(create: (_) => ChatRoomHelpers()),
           ChangeNotifierProvider(create: (_) => AltProfileHelpers()),
           ChangeNotifierProvider(create: (_) => PostFunctions()),
           ChangeNotifierProvider(create: (_) => FeedHelpers()),

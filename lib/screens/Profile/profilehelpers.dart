@@ -32,7 +32,45 @@ class ProfileHelpers with ChangeNotifier {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        createColumns("Posts", "0"),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(snapshot.data.data()['useruid'])
+                                  .collection('posts')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  return Text(
+                                    snapshot.data.docs.length.toString(),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600),
+                                  );
+                                }
+                              },
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 5),
+                              child: Text(
+                                "Posts",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -51,7 +89,12 @@ class ProfileHelpers with ChangeNotifier {
                                   );
                                 } else {
                                   return Text(
-                                      snapshot.data.docs.length.toString());
+                                    snapshot.data.docs.length.toString(),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600),
+                                  );
                                 }
                               },
                             ),
@@ -85,7 +128,12 @@ class ProfileHelpers with ChangeNotifier {
                                   );
                                 } else {
                                   return Text(
-                                      snapshot.data.docs.length.toString());
+                                    snapshot.data.docs.length.toString(),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600),
+                                  );
                                 }
                               },
                             ),
@@ -348,6 +396,7 @@ class ProfileHelpers with ChangeNotifier {
               .doc(Provider.of<Authentication>(context, listen: false)
                   .getUserUid)
               .collection('posts')
+              .orderBy('time', descending: true)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

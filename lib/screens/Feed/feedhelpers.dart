@@ -61,7 +61,7 @@ class FeedHelpers with ChangeNotifier {
           // height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: Colors.white,
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(18), topRight: Radius.circular(18))),
         ),
