@@ -91,4 +91,35 @@ class FirebaseOperations with ChangeNotifier {
           .set(followerData);
     });
   }
+
+  // Future <bool> checkFollow(String followingUid, String userid) async {
+  //   FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(followingUid)
+  //       .collection('followers')
+  //       .where("useruid", isEqualTo: userid).snapshots();
+  // }
+
+  // Future unFollowUser(
+  //     String followingUid,
+  //     followingDocId,
+  //     dynamic followingData,
+  //     String followerUid,
+  //     String followerDocId,
+  //     dynamic followerData) async {
+  //   return FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(followingUid)
+  //       .collection('followers')
+  //       .doc(followingDocId)
+  //       .set(followingData)
+  //       .whenComplete(() async {
+  //     return FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(followerUid)
+  //         .collection('following')
+  //         .doc(followerDocId)
+  //         .set(followerData);
+  //   });
+  // }
 }

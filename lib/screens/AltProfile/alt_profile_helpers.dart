@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/screens/Homepage/homepage.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/services/firebase_operations.dart';
+import 'package:social_media_app/utils/postoptions.dart';
+
+import 'alt_profile.dart';
 
 class AltProfileHelpers with ChangeNotifier {
   Widget appBar(BuildContext context) {
@@ -88,14 +92,19 @@ class AltProfileHelpers with ChangeNotifier {
                                 }
                               },
                             ),
-                            Container(
-                              margin: EdgeInsets.only(top: 5),
-                              child: Text(
-                                "Followers",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.w400),
+                            GestureDetector(
+                              onTap: () {
+                                checkFollowerSheet(context, snapshot);
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(top: 5),
+                                child: Text(
+                                  "Followers",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w400),
+                                ),
                               ),
                             ),
                           ],
@@ -252,7 +261,43 @@ class AltProfileHelpers with ChangeNotifier {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Container(
-        child: Image.asset("assets/images/empty.png"),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection("users")
+              .doc(snapshot.data.data()['useruid'])
+              .collection('posts')
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return GridView(
+                scrollDirection: Axis.vertical,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                ),
+                physics: NeverScrollableScrollPhysics(),
+                children:
+                    snapshot.data.docs.map((DocumentSnapshot documentSnapshot) {
+                  return GestureDetector(
+                    onTap: () {
+                      showPostDetails(context, documentSnapshot);
+                    },
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                            documentSnapshot.data()['postimage'],
+                            fit: BoxFit.fill)),
+                  );
+                }).toList(),
+              );
+            }
+          },
+        ),
         height: MediaQuery.of(context).size.height * 0.5,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(5.0)),
@@ -285,5 +330,233 @@ class AltProfileHelpers with ChangeNotifier {
   followedNotification(BuildContext context, String name) {
     return Scaffold.of(context)
         .showSnackBar(SnackBar(content: new Text("Followed $name")));
+  }
+
+  checkFollowerSheet(BuildContext context, dynamic snapshot) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(12)),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(snapshot.data.data()['useruid'])
+                  .collection('followers')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return ListView(
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    children: snapshot.data.docs
+                        .map((DocumentSnapshot documentSnapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else {
+                        return ListTile(
+                          onTap: () {
+                            if (documentSnapshot.data()['useruid'] !=
+                                Provider.of<Authentication>(context,
+                                        listen: false)
+                                    .getUserUid) {
+                              Navigator.pushReplacement(
+                                  context,
+                                  PageTransition(
+                                      child: AltProfile(
+                                          userUid: documentSnapshot
+                                              .data()['useruid']),
+                                      type: PageTransitionType.topToBottom));
+                            }
+                          },
+                          trailing: documentSnapshot.data()['useruid'] ==
+                                  Provider.of<Authentication>(context,
+                                          listen: false)
+                                      .getUserUid
+                              ? Container(
+                                  width: 0.0,
+                                  height: 0.0,
+                                )
+                              : MaterialButton(
+                                  color: Colors.blue,
+                                  child: Text(
+                                    "Unfollow",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  onPressed: () {},
+                                ),
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.grey,
+                            backgroundImage: NetworkImage(
+                                documentSnapshot.data()['userimage']),
+                          ),
+                          title: Text(documentSnapshot.data()['username']),
+                          subtitle: Text(documentSnapshot.data()['useremail']),
+                        );
+                      }
+                    }).toList(),
+                  );
+                }
+              },
+            ),
+          );
+        });
+  }
+
+  showPostDetails(BuildContext context, DocumentSnapshot documentSnapshot) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+              height: MediaQuery.of(context).size.height * 0.6,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(children: [
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  width: MediaQuery.of(context).size.width,
+                  child: Container(
+                    child: Image.network(documentSnapshot.data()['postimage']),
+                  ),
+                ),
+                Text(documentSnapshot.data()['caption']),
+                Container(
+                    child: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        width: 80,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onLongPress: () {
+                                Provider.of<PostFunctions>(context,
+                                        listen: false)
+                                    .showLikes(context,
+                                        documentSnapshot.data()['caption']);
+                              },
+                              onTap: () {
+                                print("adding like...");
+                                Provider.of<PostFunctions>(context,
+                                        listen: false)
+                                    .addLike(
+                                        context,
+                                        documentSnapshot.data()['caption'],
+                                        Provider.of<Authentication>(context,
+                                                listen: false)
+                                            .getUserUid);
+                              },
+                              child: Icon(
+                                FontAwesomeIcons.heart,
+                                color: Colors.black,
+                              ),
+                            ),
+                            StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('posts')
+                                  .doc(
+                                    documentSnapshot.data()['caption'],
+                                  )
+                                  .collection('likes')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                        snapshot.data.docs.length.toString()),
+                                  );
+                                }
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 80,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Provider.of<PostFunctions>(context,
+                                        listen: false)
+                                    .showCommentsSheet(
+                                        context,
+                                        documentSnapshot,
+                                        documentSnapshot.data()['caption']);
+                              },
+                              child: Icon(
+                                FontAwesomeIcons.comment,
+                                color: Colors.black,
+                              ),
+                            ),
+                            StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('posts')
+                                  .doc(
+                                    documentSnapshot.data()['caption'],
+                                  )
+                                  .collection('comments')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                        snapshot.data.docs.length.toString()),
+                                  );
+                                }
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                      Spacer(),
+                      Provider.of<Authentication>(context, listen: false)
+                                  .getUserUid ==
+                              documentSnapshot.data()['useruid']
+                          ? IconButton(
+                              icon: Icon(Icons.more_vert),
+                              onPressed: () {
+                                Provider.of<PostFunctions>(context,
+                                        listen: false)
+                                    .showPostOptions(context,
+                                        documentSnapshot.data()['caption']);
+                              },
+                            )
+                          : Container(
+                              width: 0,
+                              height: 0,
+                            )
+                    ],
+                  ),
+                )),
+              ]));
+        });
   }
 }

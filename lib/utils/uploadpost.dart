@@ -248,6 +248,30 @@ class UploadPost with ChangeNotifier {
                       'useremail': Provider.of<FirebaseOperations>(context,
                               listen: false)
                           .getinitUserEmail,
+                    }).whenComplete(() async {
+                      return FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(Provider.of<Authentication>(context,
+                                  listen: false)
+                              .getUserUid)
+                          .collection('posts')
+                          .add({
+                        'postimage': getuploadPostImageUrl,
+                        'caption': captionController.text,
+                        'username': Provider.of<FirebaseOperations>(context,
+                                listen: false)
+                            .getinitUserName,
+                        'userimage': Provider.of<FirebaseOperations>(context,
+                                listen: false)
+                            .getinitUserImage,
+                        'useruid':
+                            Provider.of<Authentication>(context, listen: false)
+                                .getUserUid,
+                        'time': Timestamp.now(),
+                        'useremail': Provider.of<FirebaseOperations>(context,
+                                listen: false)
+                            .getinitUserEmail,
+                      });
                     }).whenComplete(() {
                       captionController.clear();
                       Navigator.pop(context);
