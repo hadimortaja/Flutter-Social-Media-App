@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:social_media_app/screens/Messaging/groupmessage.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/services/firebase_operations.dart';
 
@@ -149,6 +151,76 @@ class ChatRoomHelpers with ChangeNotifier {
         });
   }
 
+  showChatroomDetails(BuildContext context, DocumentSnapshot documentSnapshot) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.27,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 150),
+                  child: Divider(
+                    thickness: 4.0,
+                    color: Colors.black,
+                  ),
+                ),
+                Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.circular(5)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Members",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.08,
+                  width: MediaQuery.of(context).size.width,
+                ),
+                Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.circular(5)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Admin",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        backgroundImage:
+                            NetworkImage(documentSnapshot.data()['userimage']),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(documentSnapshot.data()['username']),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+  }
+
   showChatrooms(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('chatrooms').snapshots(),
@@ -162,6 +234,18 @@ class ChatRoomHelpers with ChangeNotifier {
             children:
                 snapshot.data.docs.map((DocumentSnapshot documentSnapshot) {
               return ListTile(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                          child: GroupMessage(
+                            documentSnapshot: documentSnapshot,
+                          ),
+                          type: PageTransitionType.leftToRight));
+                },
+                onLongPress: () {
+                  showChatroomDetails(context, documentSnapshot);
+                },
                 title: Text(documentSnapshot.data()['roomname']),
                 subtitle: Text("Last Message"),
                 trailing: Text("2 hours ago"),

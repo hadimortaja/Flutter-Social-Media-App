@@ -597,7 +597,10 @@ class ProfileHelpers with ChangeNotifier {
                 ),
                 Row(
                   children: [
-                    Text(documentSnapshot.data()['caption']),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(documentSnapshot.data()['caption']),
+                    ),
                   ],
                 ),
                 Container(
