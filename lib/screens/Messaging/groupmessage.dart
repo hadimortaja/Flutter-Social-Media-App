@@ -31,10 +31,7 @@ class GroupMessage extends StatelessWidget {
             Icons.arrow_back_ios_rounded,
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-                context,
-                PageTransition(
-                    child: HomePage(), type: PageTransitionType.leftToRight));
+            Navigator.pop(context);
           },
         ),
         backgroundColor: Colors.grey[300],
@@ -73,6 +70,9 @@ class GroupMessage extends StatelessWidget {
           child: Column(
             children: [
               AnimatedContainer(
+                child: Provider.of<GroupMessageHelper>(context, listen: false)
+                    .showMessages(context, documentSnapshot,
+                        documentSnapshot.data()['useruid']),
                 height: MediaQuery.of(context).size.height * 0.8,
                 width: MediaQuery.of(context).size.width,
                 duration: Duration(seconds: 1),
