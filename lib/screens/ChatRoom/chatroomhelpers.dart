@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:social_media_app/screens/AltProfile/alt_profile.dart';
 import 'package:social_media_app/screens/Messaging/groupmessage.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/services/firebase_operations.dart';
@@ -183,6 +184,51 @@ class ChatRoomHelpers with ChangeNotifier {
                       ),
                     )),
                 Container(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('chatrooms')
+                        .doc(documentSnapshot.id)
+                        .collection("members")
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else {
+                        return ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: snapshot.data.docs
+                              .map((DocumentSnapshot documentSnapshot) {
+                            return GestureDetector(
+                              onTap: () {
+                                if (Provider.of<Authentication>(context,
+                                            listen: false)
+                                        .getUserUid !=
+                                    documentSnapshot.data()['useruid']) {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      PageTransition(
+                                          child: AltProfile(
+                                            userUid: documentSnapshot
+                                                .data()['useruid'],
+                                          ),
+                                          type:
+                                              PageTransitionType.bottomToTop));
+                                }
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.grey,
+                                  backgroundImage: NetworkImage(
+                                      documentSnapshot.data()['userimage']),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      }
+                    },
+                  ),
                   height: MediaQuery.of(context).size.height * 0.08,
                   width: MediaQuery.of(context).size.width,
                 ),
@@ -223,7 +269,10 @@ class ChatRoomHelpers with ChangeNotifier {
 
   showChatrooms(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('chatrooms').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('chatrooms')
+          .orderBy('time', descending: true)
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(

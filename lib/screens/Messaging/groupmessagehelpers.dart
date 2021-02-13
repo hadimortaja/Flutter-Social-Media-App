@@ -2,10 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:social_media_app/screens/Homepage/homepage.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/services/firebase_operations.dart';
 
 class GroupMessageHelper with ChangeNotifier {
+  bool hasMemberJoined = false;
+  bool get getHasMemberJoined => hasMemberJoined;
   showMessages(BuildContext context, DocumentSnapshot documentSnapshot,
       String adminUserUid) {
     return StreamBuilder<QuerySnapshot>(
@@ -228,5 +231,77 @@ class GroupMessageHelper with ChangeNotifier {
       'userimage': Provider.of<FirebaseOperations>(context, listen: false)
           .getinitUserImage,
     });
+  }
+
+  Future checkIfJoin(BuildContext context, String chatRoomName,
+      String chatRoomAdminUid) async {
+    return FirebaseFirestore.instance
+        .collection('chatrooms')
+        .doc(chatRoomName)
+        .collection('members')
+        .doc(Provider.of<Authentication>(context, listen: false).getUserUid)
+        .get()
+        .then((value) {
+      hasMemberJoined = false;
+      print("Initial state => $hasMemberJoined");
+      if (value.data()['joined'] != null) {
+        hasMemberJoined = value.data()['joined'];
+        print('Final state => $hasMemberJoined');
+        notifyListeners();
+      }
+      if (Provider.of<Authentication>(context, listen: false).getUserUid ==
+          chatRoomAdminUid) {
+        hasMemberJoined = true;
+        notifyListeners();
+      }
+    });
+  }
+
+  askToJoin(BuildContext context, String roomName) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Join $roomName? "),
+            actions: [
+              MaterialButton(
+                  child: Text("No"),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                        context, MaterialPageRoute(builder: (_) => HomePage()));
+
+                    ///
+                  }),
+              MaterialButton(
+                  child: Text("Yes"),
+                  onPressed: () async {
+                    FirebaseFirestore.instance
+                        .collection('chatrooms')
+                        .doc(roomName)
+                        .collection('members')
+                        .doc(Provider.of<Authentication>(context, listen: false)
+                            .getUserUid)
+                        .set({
+                      'joined': true,
+                      'username': Provider.of<FirebaseOperations>(context,
+                              listen: false)
+                          .getinitUserName,
+                      'useremail': Provider.of<FirebaseOperations>(context,
+                              listen: false)
+                          .getinitUserEmail,
+                      'userimage': Provider.of<FirebaseOperations>(context,
+                              listen: false)
+                          .getinitUserImage,
+                      'useruid':
+                          Provider.of<Authentication>(context, listen: false)
+                              .getUserUid,
+                      'time': Timestamp.now()
+                    }).whenComplete(() {
+                      Navigator.pop(context);
+                    });
+                  })
+            ],
+          );
+        });
   }
 }

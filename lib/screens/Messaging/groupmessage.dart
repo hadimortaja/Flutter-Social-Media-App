@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -6,11 +8,35 @@ import 'package:social_media_app/screens/Homepage/homepage.dart';
 import 'package:social_media_app/screens/Messaging/groupmessagehelpers.dart';
 import 'package:social_media_app/services/authentication.dart';
 
-class GroupMessage extends StatelessWidget {
+class GroupMessage extends StatefulWidget {
   final DocumentSnapshot documentSnapshot;
-  TextEditingController messageController = TextEditingController();
 
   GroupMessage({@required this.documentSnapshot});
+
+  @override
+  _GroupMessageState createState() => _GroupMessageState();
+}
+
+class _GroupMessageState extends State<GroupMessage> {
+  TextEditingController messageController = TextEditingController();
+
+  @override
+  void initState() {
+    Provider.of<GroupMessageHelper>(context, listen: false)
+        .checkIfJoin(context, widget.documentSnapshot.id,
+            widget.documentSnapshot.data()['useruid'])
+        .whenComplete(() async {
+      if (Provider.of<GroupMessageHelper>(context, listen: false)
+              .getHasMemberJoined ==
+          false) {
+        Timer(
+            Duration(milliseconds: 10),
+            () => Provider.of<GroupMessageHelper>(context, listen: false)
+                .askToJoin(context, widget.documentSnapshot.id));
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +44,7 @@ class GroupMessage extends StatelessWidget {
       appBar: AppBar(
         actions: [
           Provider.of<Authentication>(context, listen: false).getUserUid ==
-                  documentSnapshot.data()['useruid']
+                  widget.documentSnapshot.data()['useruid']
               ? IconButton(icon: Icon(Icons.more_vert), onPressed: () {})
               : Container(
                   width: 0,
@@ -42,7 +68,7 @@ class GroupMessage extends StatelessWidget {
               CircleAvatar(
                 backgroundColor: Colors.grey,
                 backgroundImage:
-                    NetworkImage(documentSnapshot.data()['roomavatar']),
+                    NetworkImage(widget.documentSnapshot.data()['roomavatar']),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
@@ -51,13 +77,30 @@ class GroupMessage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      documentSnapshot.data()['roomname'],
+                      widget.documentSnapshot.data()['roomname'],
                       style: TextStyle(color: Colors.black, fontSize: 15),
                     ),
-                    Text(
-                      "2 Members",
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
+                    StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('chatrooms')
+                            .doc(widget.documentSnapshot.id)
+                            .collection('members')
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Container(
+                              width: 0.0,
+                              height: 0.0,
+                            );
+                          } else {
+                            return Text(
+                              "${snapshot.data.docs.length.toString()} members",
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 12),
+                            );
+                          }
+                        })
                   ],
                 ),
               )
@@ -71,8 +114,8 @@ class GroupMessage extends StatelessWidget {
             children: [
               AnimatedContainer(
                 child: Provider.of<GroupMessageHelper>(context, listen: false)
-                    .showMessages(context, documentSnapshot,
-                        documentSnapshot.data()['useruid']),
+                    .showMessages(context, widget.documentSnapshot,
+                        widget.documentSnapshot.data()['useruid']),
                 height: MediaQuery.of(context).size.height * 0.8,
                 width: MediaQuery.of(context).size.width,
                 duration: Duration(seconds: 1),
@@ -98,7 +141,7 @@ class GroupMessage extends StatelessWidget {
                             if (messageController.text.isNotEmpty) {
                               Provider.of<GroupMessageHelper>(context,
                                       listen: false)
-                                  .sendMessage(context, documentSnapshot,
+                                  .sendMessage(context, widget.documentSnapshot,
                                       messageController);
                               messageController.clear();
                             }
