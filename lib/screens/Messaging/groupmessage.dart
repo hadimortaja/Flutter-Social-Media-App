@@ -126,15 +126,19 @@ class _GroupMessageState extends State<GroupMessage> {
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Row(
                     children: [
+                      IconButton(
+                        icon: Icon(Icons.emoji_emotions),
+                        onPressed: () {},
+                      ),
                       Container(
-                        width: MediaQuery.of(context).size.width * 0.8,
+                        width: MediaQuery.of(context).size.width * 0.6,
                         child: TextField(
                           controller: messageController,
                           decoration: InputDecoration(hintText: 'Drop a hi..'),
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(left: 10),
+                        margin: EdgeInsets.only(left: 15),
                         width: 50,
                         child: RaisedButton(
                           onPressed: () {

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -56,34 +57,81 @@ class UploadPost with ChangeNotifier {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-              title: Text("From where do you want to take the photo?"),
-              content: SingleChildScrollView(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    GestureDetector(
-                      child: Text("Gallery"),
-                      onTap: () {
+          return Platform.isIOS
+              ? CupertinoAlertDialog(
+                  title: Text("From where do you want to take the photo?"),
+                  actions: [
+                    CupertinoDialogAction(
+                      child: Text('Gallery'),
+                      onPressed: () {
                         pickUploadPostImage(
                           context,
                           ImageSource.gallery,
                         );
                       },
                     ),
-                    Padding(padding: EdgeInsets.all(8.0)),
-                    GestureDetector(
-                      child: Text("Camera"),
-                      onTap: () {
+                    CupertinoDialogAction(
+                      child: Text('Camera'),
+                      onPressed: () {
                         pickUploadPostImage(context, ImageSource.camera);
-
-                        // await Timer(
-                        //     Duration(seconds: 2), () => Navigator.pop(context));
                       },
-                    )
+                    ),
                   ],
-                ),
-              ));
+                  //content: SingleChildScrollView(
+                  //child: Row(
+                  //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //children: [
+                  //GestureDetector(
+                  //child: Text("Gallery"),
+                  //onTap: () {
+                  //pickUploadPostImage(
+                  //context,
+                  //ImageSource.gallery,
+                  //);
+                  // },
+                  //),
+                  //Padding(padding: EdgeInsets.all(8.0)),
+                  //GestureDetector(
+                  //child: Text("Camera"),
+                  //onTap: () {
+                  // pickUploadPostImage(context, ImageSource.camera);
+
+                  // await Timer(
+                  //     Duration(seconds: 2), () => Navigator.pop(context));
+                  // },
+                  //)
+                  //],
+                  //),
+                  //)
+                )
+              : AlertDialog(
+                  title: Text("From where do you want to take the photo?"),
+                  content: SingleChildScrollView(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        GestureDetector(
+                          child: Text("Gallery"),
+                          onTap: () {
+                            pickUploadPostImage(
+                              context,
+                              ImageSource.gallery,
+                            );
+                          },
+                        ),
+                        Padding(padding: EdgeInsets.all(8.0)),
+                        GestureDetector(
+                          child: Text("Camera"),
+                          onTap: () {
+                            pickUploadPostImage(context, ImageSource.camera);
+
+                            // await Timer(
+                            //     Duration(seconds: 2), () => Navigator.pop(context));
+                          },
+                        )
+                      ],
+                    ),
+                  ));
         });
   }
 

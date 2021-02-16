@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -97,29 +100,62 @@ class PostFunctions with ChangeNotifier {
                           showDialog(
                               context: context,
                               builder: (context) {
-                                return AlertDialog(
-                                  title: Text("Delete This Post?"),
-                                  actions: [
-                                    FlatButton(
-                                      onPressed: () {
-                                        print("you choose no");
-                                        Navigator.of(context).pop(false);
-                                      },
-                                      child: Text('No'),
-                                    ),
-                                    FlatButton(
-                                      onPressed: () {
-                                        Provider.of<FirebaseOperations>(context,
-                                                listen: false)
-                                            .deleteUserData(postId, "posts")
-                                            .whenComplete(() {
-                                          Navigator.pop(context);
-                                        });
-                                      },
-                                      child: Text('Yes'),
-                                    ),
-                                  ],
-                                );
+                                return Platform.isIOS
+                                    ? CupertinoAlertDialog(
+                                        title: Text("Delete This Post?"),
+                                        actions: [
+                                          CupertinoDialogAction(
+                                            isDefaultAction: true,
+                                            onPressed: () {
+                                              print("you choose no");
+                                              Navigator.of(context).pop(false);
+                                            },
+                                            child: Text('No'),
+                                          ),
+                                          CupertinoDialogAction(
+                                            onPressed: () {
+                                              Provider.of<FirebaseOperations>(
+                                                      context,
+                                                      listen: false)
+                                                  .deleteUserData(
+                                                      postId, "posts")
+                                                  .whenComplete(() {
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                            child: Text(
+                                              'Yes',
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : AlertDialog(
+                                        title: Text("Delete This Post?"),
+                                        actions: [
+                                          FlatButton(
+                                            onPressed: () {
+                                              print("you choose no");
+                                              Navigator.of(context).pop(false);
+                                            },
+                                            child: Text('No'),
+                                          ),
+                                          FlatButton(
+                                            onPressed: () {
+                                              Provider.of<FirebaseOperations>(
+                                                      context,
+                                                      listen: false)
+                                                  .deleteUserData(
+                                                      postId, "posts")
+                                                  .whenComplete(() {
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                            child: Text('Yes'),
+                                          ),
+                                        ],
+                                      );
                               });
                         },
                       )

@@ -304,4 +304,34 @@ class GroupMessageHelper with ChangeNotifier {
           );
         });
   }
+
+  showSticker(BuildContext context) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return AnimatedContainer(
+            duration: Duration(seconds: 1),
+            curve:Curves.easeIn,
+            child: Column(
+              children: [
+                Padding(
+                  padding:  EdgeInsets.symmetric(horizontal: 105),
+                  child: Divider(
+                    thickness: 4,
+                    color:Colors.black,
+                    
+                  ),
+                ),
+                Container(),
+              ],
+            ),
+              height: MediaQuery.of(context).size.height * 0.5,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12))));
+        });
+  }
 }

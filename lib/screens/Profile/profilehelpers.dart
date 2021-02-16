@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:page_transition/page_transition.dart';
@@ -451,33 +454,61 @@ class ProfileHelpers with ChangeNotifier {
     return showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text("Log out ?"),
-            content: Text('We hate to see you leave...'),
-            actions: [
-              FlatButton(
-                onPressed: () {
-                  print("you choose no");
-                  Navigator.of(context).pop(false);
-                },
-                child: Text('No'),
-              ),
-              FlatButton(
-                onPressed: () {
-                  Provider.of<Authentication>(context, listen: false)
-                      .logOutViaEmail()
-                      .whenComplete(() {
-                    Navigator.pushReplacement(
-                        context,
-                        PageTransition(
-                            child: LandingPage(),
-                            type: PageTransitionType.bottomToTop));
-                  });
-                },
-                child: Text('Yes'),
-              ),
-            ],
-          );
+          return Platform.isIOS
+              ? CupertinoAlertDialog(
+                  title: Text("Log out ?"),
+                  content: Text('We hate to see you leave...'),
+                  actions: [
+                    CupertinoDialogAction(
+                      onPressed: () {
+                        print("you choose no");
+                        Navigator.of(context).pop(false);
+                      },
+                      child: Text('No'),
+                    ),
+                    CupertinoDialogAction(
+                      onPressed: () {
+                        Provider.of<Authentication>(context, listen: false)
+                            .logOutViaEmail()
+                            .whenComplete(() {
+                          Navigator.pushReplacement(
+                              context,
+                              PageTransition(
+                                  child: LandingPage(),
+                                  type: PageTransitionType.bottomToTop));
+                        });
+                      },
+                      child: Text('Yes'),
+                    ),
+                  ],
+                )
+              : AlertDialog(
+                  title: Text("Log out ?"),
+                  content: Text('We hate to see you leave...'),
+                  actions: [
+                    FlatButton(
+                      onPressed: () {
+                        print("you choose no");
+                        Navigator.of(context).pop(false);
+                      },
+                      child: Text('No'),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        Provider.of<Authentication>(context, listen: false)
+                            .logOutViaEmail()
+                            .whenComplete(() {
+                          Navigator.pushReplacement(
+                              context,
+                              PageTransition(
+                                  child: LandingPage(),
+                                  type: PageTransitionType.bottomToTop));
+                        });
+                      },
+                      child: Text('Yes'),
+                    ),
+                  ],
+                );
         });
   }
 
