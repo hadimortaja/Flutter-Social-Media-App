@@ -128,7 +128,11 @@ class _GroupMessageState extends State<GroupMessage> {
                     children: [
                       IconButton(
                         icon: Icon(Icons.emoji_emotions),
-                        onPressed: () {},
+                        onPressed: () {
+                          Provider.of<GroupMessageHelper>(context,
+                                  listen: false)
+                              .showSticker(context);
+                        },
                       ),
                       Container(
                         width: MediaQuery.of(context).size.width * 0.6,

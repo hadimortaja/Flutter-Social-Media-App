@@ -393,6 +393,7 @@ class ProfileHelpers with ChangeNotifier {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Container(
+        
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection("users")
@@ -414,7 +415,7 @@ class ProfileHelpers with ChangeNotifier {
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
                 ),
-                physics: NeverScrollableScrollPhysics(),
+               // physics: NeverScrollableScrollPhysics(),
                 children:
                     snapshot.data.docs.map((DocumentSnapshot documentSnapshot) {
                   return GestureDetector(
@@ -443,7 +444,7 @@ class ProfileHelpers with ChangeNotifier {
             }
           },
         ),
-        height: MediaQuery.of(context).size.height * 0.4,
+        height: MediaQuery.of(context).size.height * 0.53,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(5.0)),
       ),

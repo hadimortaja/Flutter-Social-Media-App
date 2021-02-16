@@ -310,28 +310,86 @@ class GroupMessageHelper with ChangeNotifier {
         context: context,
         builder: (context) {
           return AnimatedContainer(
-            duration: Duration(seconds: 1),
-            curve:Curves.easeIn,
-            child: Column(
-              children: [
-                Padding(
-                  padding:  EdgeInsets.symmetric(horizontal: 105),
-                  child: Divider(
-                    thickness: 4,
-                    color:Colors.black,
-                    
+              duration: Duration(seconds: 1),
+              curve: Curves.easeIn,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 105),
+                    child: Divider(
+                      thickness: 4,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                Container(),
-              ],
-            ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.1,
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(color: Colors.blue)),
+                            height: 30,
+                            width: 30,
+                            child: Icon(Icons.emoji_emotions),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.35,
+                    width: MediaQuery.of(context).size.width,
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection("stickers")
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else {
+                          return GridView(
+                              children: snapshot.data.docs
+                                  .map((DocumentSnapshot documentSnapshot) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    print(documentSnapshot.data()['image']);
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: 40,
+                                    child: Image.network(
+                                      documentSnapshot.data()['image'],
+                                      scale: 1,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3));
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
               height: MediaQuery.of(context).size.height * 0.5,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                color: Colors.white,
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(12),
                       topRight: Radius.circular(12))));
         });
+  }
+  sendStickers(BuildContext context,String stickerImageUrl,String chatRoomId){
+
   }
 }
