@@ -131,7 +131,7 @@ class _GroupMessageState extends State<GroupMessage> {
                         onPressed: () {
                           Provider.of<GroupMessageHelper>(context,
                                   listen: false)
-                              .showSticker(context);
+                              .showSticker(context,widget.documentSnapshot.id);
                         },
                       ),
                       Container(

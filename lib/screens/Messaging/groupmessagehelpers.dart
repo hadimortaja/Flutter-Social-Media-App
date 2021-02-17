@@ -5,9 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:social_media_app/screens/Homepage/homepage.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/services/firebase_operations.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class GroupMessageHelper with ChangeNotifier {
   bool hasMemberJoined = false;
+  String lastMessageTime;
+  String get getLastMessageTime => lastMessageTime;
   bool get getHasMemberJoined => hasMemberJoined;
   showMessages(BuildContext context, DocumentSnapshot documentSnapshot,
       String adminUserUid) {
@@ -42,12 +45,20 @@ class GroupMessageHelper with ChangeNotifier {
                                 child: Container(
                                   width: 170,
                                   constraints: BoxConstraints(
-                                      maxHeight:
-                                          MediaQuery.of(context).size.height *
-                                              0.1,
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                              0.8),
+                                      maxHeight: documentSnapshot
+                                                  .data()['message'] !=
+                                              null
+                                          ? MediaQuery.of(context).size.height *
+                                              0.1
+                                          : MediaQuery.of(context).size.height *
+                                              0.4,
+                                      maxWidth: documentSnapshot
+                                                  .data()['message'] !=
+                                              null
+                                          ? MediaQuery.of(context).size.width *
+                                              0.8
+                                          : MediaQuery.of(context).size.width *
+                                              0.9),
                                   child: ListTile(
                                     trailing: CircleAvatar(
                                       radius: 15,
@@ -66,10 +77,21 @@ class GroupMessageHelper with ChangeNotifier {
                                             fontSize: 14, color: Colors.black),
                                       ),
                                     ),
-                                    subtitle: Text(
-                                        documentSnapshot.data()['message'],
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 12)),
+                                    subtitle: documentSnapshot
+                                                .data()['message'] !=
+                                            null
+                                        ? Text(
+                                            documentSnapshot.data()['message'],
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12))
+                                        : Container(
+                                            height: 50,
+                                            width: 50,
+                                            child: Image.network(
+                                                documentSnapshot
+                                                    .data()['sticker']),
+                                          ),
                                   ),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
@@ -88,12 +110,20 @@ class GroupMessageHelper with ChangeNotifier {
                                 child: Container(
                                   width: 170,
                                   constraints: BoxConstraints(
-                                      maxHeight:
-                                          MediaQuery.of(context).size.height *
-                                              0.1,
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                              0.8),
+                                      maxHeight: documentSnapshot
+                                                  .data()['message'] !=
+                                              null
+                                          ? MediaQuery.of(context).size.height *
+                                              0.1
+                                          : MediaQuery.of(context).size.height *
+                                              0.4,
+                                      maxWidth: documentSnapshot
+                                                  .data()['message'] !=
+                                              null
+                                          ? MediaQuery.of(context).size.width *
+                                              0.8
+                                          : MediaQuery.of(context).size.width *
+                                              0.9),
                                   child: ListTile(
                                     leading: CircleAvatar(
                                       radius: 15,
@@ -112,10 +142,21 @@ class GroupMessageHelper with ChangeNotifier {
                                             fontSize: 14, color: Colors.black),
                                       ),
                                     ),
-                                    subtitle: Text(
-                                        documentSnapshot.data()['message'],
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 12)),
+                                    subtitle: documentSnapshot
+                                                .data()['message'] !=
+                                            null
+                                        ? Text(
+                                            documentSnapshot.data()['message'],
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12))
+                                        : Container(
+                                            height: 50,
+                                            width: 50,
+                                            child: Image.network(
+                                                documentSnapshot
+                                                    .data()['sticker']),
+                                          ),
                                   ),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
@@ -305,7 +346,7 @@ class GroupMessageHelper with ChangeNotifier {
         });
   }
 
-  showSticker(BuildContext context) {
+  showSticker(BuildContext context, String chatroomid) {
     return showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -359,7 +400,10 @@ class GroupMessageHelper with ChangeNotifier {
                                   .map((DocumentSnapshot documentSnapshot) {
                                 return GestureDetector(
                                   onTap: () {
-                                    print(documentSnapshot.data()['image']);
+                                    sendStickers(
+                                        context,
+                                        documentSnapshot.data()['image'],
+                                        chatroomid);
                                   },
                                   child: Container(
                                     height: 40,
@@ -389,7 +433,20 @@ class GroupMessageHelper with ChangeNotifier {
                       topRight: Radius.circular(12))));
         });
   }
-  sendStickers(BuildContext context,String stickerImageUrl,String chatRoomId){
 
+  sendStickers(
+      BuildContext context, String stickerImageUrl, String chatRoomId) async {
+    await FirebaseFirestore.instance
+        .collection('chatrooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add({
+      'sticker': stickerImageUrl,
+      'username': Provider.of<FirebaseOperations>(context, listen: false)
+          .getinitUserName,
+      'userimage': Provider.of<FirebaseOperations>(context, listen: false)
+          .getinitUserImage,
+      'time': Timestamp.now()
+    });
   }
 }
