@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/screens/Homepage/homepage.dart';
 import 'package:social_media_app/services/authentication.dart';
@@ -448,5 +452,78 @@ class GroupMessageHelper with ChangeNotifier {
           .getinitUserImage,
       'time': Timestamp.now()
     });
+  }
+
+  leaveTheRoom(BuildContext context, String chatRoomName) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Platform.isIOS
+              ? CupertinoAlertDialog(
+                  title: Text("Leave $chatRoomName ?"),
+                  content: Text('We hate to see you leave...'),
+                  actions: [
+                    CupertinoDialogAction(
+                      onPressed: () {
+                        print("you choose no");
+                        Navigator.pop(context);
+                      },
+                      child: Text('No'),
+                    ),
+                    CupertinoDialogAction(
+                      onPressed: () {
+                        FirebaseFirestore.instance
+                            .collection('chatrooms')
+                            .doc(chatRoomName)
+                            .collection('members')
+                            .doc(Provider.of<Authentication>(context,
+                                    listen: false)
+                                .getUserUid)
+                            .delete()
+                            .whenComplete(() {
+                          Navigator.pushReplacement(
+                              context,
+                              PageTransition(
+                                  child: HomePage(),
+                                  type: PageTransitionType.fade));
+                        });
+                      },
+                      child: Text('Yes'),
+                    ),
+                  ],
+                )
+              : AlertDialog(
+                  title: Text("Leave $chatRoomName ?"),
+                  actions: [
+                    FlatButton(
+                      onPressed: () {
+                        print("you choose no");
+                        Navigator.pop(context);
+                      },
+                      child: Text('No'),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        FirebaseFirestore.instance
+                            .collection('chatrooms')
+                            .doc(chatRoomName)
+                            .collection('members')
+                            .doc(Provider.of<Authentication>(context,
+                                    listen: false)
+                                .getUserUid)
+                            .delete()
+                            .whenComplete(() {
+                          Navigator.pushReplacement(
+                              context,
+                              PageTransition(
+                                  child: HomePage(),
+                                  type: PageTransitionType.fade));
+                        });
+                      },
+                      child: Text('Yes'),
+                    ),
+                  ],
+                );
+        });
   }
 }

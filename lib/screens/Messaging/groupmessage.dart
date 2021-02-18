@@ -50,7 +50,12 @@ class _GroupMessageState extends State<GroupMessage> {
                   width: 0,
                   height: 0,
                 ),
-          IconButton(icon: Icon(Icons.logout), onPressed: () {}),
+          IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () {
+                Provider.of<GroupMessageHelper>(context, listen: false)
+                    .leaveTheRoom(context, widget.documentSnapshot.id);
+              }),
         ],
         leading: IconButton(
           icon: Icon(
@@ -131,7 +136,7 @@ class _GroupMessageState extends State<GroupMessage> {
                         onPressed: () {
                           Provider.of<GroupMessageHelper>(context,
                                   listen: false)
-                              .showSticker(context,widget.documentSnapshot.id);
+                              .showSticker(context, widget.documentSnapshot.id);
                         },
                       ),
                       Container(
