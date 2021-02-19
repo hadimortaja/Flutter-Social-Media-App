@@ -37,34 +37,50 @@ class FeedHelpers with ChangeNotifier {
 
   Widget feedBody(BuildContext context) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Container(
-          child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('posts')
-                .orderBy('time', descending: true)
-                .snapshots(), /////
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                    child: Container(
-                  height: 10,
-                  width: 10,
-                  child: CircularProgressIndicator(),
-                ));
-              } else {
-                return loadPosts(context, snapshot);
-              }
-            },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              // child: StreamBuilder<,
+              height: MediaQuery.of(context).size.height * 0.07,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(12)),
+            ),
           ),
-          // height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(18), topRight: Radius.circular(18))),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Container(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('posts')
+                    .orderBy('time', descending: true)
+                    .snapshots(), /////
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child: Container(
+                      height: 10,
+                      width: 10,
+                      child: CircularProgressIndicator(),
+                    ));
+                  } else {
+                    return loadPosts(context, snapshot);
+                  }
+                },
+              ),
+              // height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18))),
+            ),
+          ),
+        ],
       ),
     );
   }

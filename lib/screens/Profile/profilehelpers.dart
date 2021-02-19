@@ -8,10 +8,12 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/screens/AltProfile/alt_profile.dart';
 import 'package:social_media_app/screens/Landing/landing_page.dart';
+import 'package:social_media_app/screens/Stories/stories_widgets.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/utils/postoptions.dart';
 
 class ProfileHelpers with ChangeNotifier {
+  final StoryWidgets storyWidgets = StoryWidgets();
   Widget headerProfile(BuildContext context, dynamic snapshot) {
     return Padding(
       padding: const EdgeInsets.all(15),
@@ -19,13 +21,22 @@ class ProfileHelpers with ChangeNotifier {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: Colors.white,
-                backgroundImage: (snapshot.data.data()['userimage'] == null)
-                    ? NetworkImage(
-                        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/600px-No_image_available.svg.png")
-                    : NetworkImage(snapshot.data.data()['userimage']),
+              GestureDetector(
+                onTap: () {
+                  storyWidgets.addStory(context);
+                },
+                child: Stack(children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.white,
+                    backgroundImage: (snapshot.data.data()['userimage'] == null)
+                        ? NetworkImage(
+                            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/600px-No_image_available.svg.png")
+                        : NetworkImage(snapshot.data.data()['userimage']),
+                  ),
+                  Positioned(
+                      top: 55, left: 55, child: Icon(Icons.add_circle_outline))
+                ]),
               ),
               Expanded(
                 flex: 1,
@@ -393,7 +404,6 @@ class ProfileHelpers with ChangeNotifier {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Container(
-        
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection("users")
@@ -415,7 +425,7 @@ class ProfileHelpers with ChangeNotifier {
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
                 ),
-               // physics: NeverScrollableScrollPhysics(),
+                // physics: NeverScrollableScrollPhysics(),
                 children:
                     snapshot.data.docs.map((DocumentSnapshot documentSnapshot) {
                   return GestureDetector(

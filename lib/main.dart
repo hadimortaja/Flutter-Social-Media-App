@@ -12,6 +12,7 @@ import 'package:social_media_app/screens/Landing/landing_utils.dart';
 import 'package:social_media_app/screens/Messaging/groupmessagehelpers.dart';
 import 'package:social_media_app/screens/Profile/profilehelpers.dart';
 import 'package:social_media_app/screens/Splash/splash_screen.dart';
+import 'package:social_media_app/screens/Stories/stories_helper.dart';
 import 'package:social_media_app/services/authentication.dart';
 import 'package:social_media_app/services/firebase_operations.dart';
 import 'package:social_media_app/utils/postoptions.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
           home: SplashScreen(),
         ),
         providers: [
+          ChangeNotifierProvider(create: (_) => StoriesHelper()),
           ChangeNotifierProvider(create: (_) => GroupMessageHelper()),
           ChangeNotifierProvider(create: (_) => ChatRoomHelpers()),
           ChangeNotifierProvider(create: (_) => AltProfileHelpers()),
