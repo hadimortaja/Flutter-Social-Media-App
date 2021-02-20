@@ -13,3 +13,7 @@ class ConstantColors {
   final Color transperant = Colors.transparent;
   final Color greyColor = Colors.grey.shade600;
 }
+
+MediaWidth(BuildContext context) {
+  return MediaQuery.of(context).size.width;
+}
