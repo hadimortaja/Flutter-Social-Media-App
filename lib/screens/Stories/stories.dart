@@ -19,7 +19,7 @@ class _StoriesState extends State<Stories> {
         SingleChildScrollView(
           child: Container(
             height: MediaQuery.of(context).size.height,
-            width: MediaWidth(context),
+            width: MediaWidth(context), 
             child: Column(children: [
               Container(
                 height: MediaQuery.of(context).size.height,
